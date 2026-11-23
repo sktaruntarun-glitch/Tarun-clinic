@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tarun Homoeo Clinic - Dr. N. K. Tarun</title>
+  <style>
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f9f6;
+      color: #333;
+      padding-bottom: 85px;
+    }
+
+    /* 1. Navigation Bar */
+    .navbar {
+      background-color: #124d31;
+      padding: 12px 6px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      margin: 0 7px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    /* 2. Header Design */
+    .header {
+      background-color: #1b6b45;
+      color: white;
+      padding: 25px 15px 30px;
+      text-align: center;
+    }
+    .clinic-logo {
+      width: 165px;
+      background-color: white;
+      padding: 8px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+    .header h1 { margin: 0; font-size: 26px; }
+    .header p { margin: 6px 0 18px; font-size: 14px; color: #d4edda; line-height: 1.4; }
+    
+    .btn {
+      background-color: #ff9800;
+      color: white;
+      padding: 11px 18px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      display: inline-block;
+      border: none;
+      font-size: 15px;
+    }
+
+    /* 3. Trust Badges Row */
+    .trust-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin: -18px 15px 15px 15px;
+      position: relative;
+      z-index: 10;
+    }
+    .badge-card {
+      background: white;
+      flex: 1;
+      padding: 12px 6px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+      border-bottom: 3px solid #1b6b45;
+    }
+    .badge-card h3 { margin: 0; color: #1b6b45; font-size: 17px; }
+    .badge-card span { display: block; font-size: 11px; color: #555; margin-top: 3px; font-weight: bold; }
+
+    /* 4. Sections Box Design */
+    .box {
+      background: white;
+      margin: 15px;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    h2 { color: #1b6b45; margin-top: 0; border-bottom: 2px solid #e0f2e9; padding-bottom: 8px; font-size: 20px; }
+    ul { padding-left: 20px; line-height: 1.8; }
+
+    /* 5. Patient Review Card Design */
+    .review-card {
+      background-color: #f9fcfa;
+      border-left: 4px solid #1b6b45;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      border-radius: 5px;
+    }
+    .stars { color: #f59e0b; font-size: 15px; margin-bottom: 4px; }
+    .review-text { font-size: 14px; font-style: italic; color: #444; margin: 4px 0 6px 0; line-height: 1.5; }
+    .patient-name { font-size: 12px; font-weight: bold; color: #1b6b45; }
+
+    /* 6. FAQ Accordion Design */
+    details {
+      background-color: #f4f9f6;
+      border: 1px solid #d4edda;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+    summary {
+      font-weight: bold;
+      color: #124d31;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    details p {
+      margin: 8px 0 2px 0;
+      font-size: 13.5px;
+      color: #444;
+      line-height: 1.5;
+    }
+
+    /* 7. Address & Timing Info Rows */
+    .info-item {
+      background: #f4f9f6;
+      padding: 10px 12px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* 8. Form & Payment Box Design */
+    label { font-weight: bold; font-size: 14px; color: #222; }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0 14px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-size: 15px;
+      background-color: white;
+    }
+    .upi-box {
+      display: none;
+      background-color: #fff8e7;
+      border: 1.5px dashed #ff9800;
+      padding: 14px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .upi-box p { margin: 5px 0; font-size: 13.5px; color: #333; }
+    .upi-pay-btn {
+      background-color: #5f259f;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    /* Floating WhatsApp Button */
+    .floating-wa {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      background-color: #25D366;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    /* 9. Footer */
+    .footer {
+      background-color: #1b6b45;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 13px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Menu Bar -->
+  <div class="navbar">
+    <a href="#about">About</a>
+    <a href="#treatments">Treatments</a>
+    <a href="#reviews">Reviews</a>
+    <a href="#appointment">Book Slot</a>
+    <a href="#contact">Address</a>
+  </div>
+
+  <!-- Top Banner with Clinic Logo -->
+  <div class="header">
+    <img src="https://i.ibb.co/GvCS6WLc/Screenshot-2026-11-23-11-21-39-03-680d03679600f7af0b4c700c6b270fe7.jpg" alt="Tarun Homoeo Clinic Logo" class="clinic-logo">
+    <h1>Tarun Homoeo Clinic</h1>
+    <p>Dr. N. K. Tarun (DHMS)<br>Senior Homoeopathic Physician | 45+ Years Experience</p>
+    
+    <a href="tel:+919835608949" class="btn">&#128222; Call Now</a>
+    <a href="https://wa.me/919835608949?text=Namaste%20Doctor,%20mujhe%20appointment%20chahiye" target="_blank" class="btn" style="background-color: #25D366; margin-left: 8px;">&#128172; WhatsApp</a>
+  </div>
+
+  <!-- 3 Trust Badges -->
+  <div class="trust-row">
+    <div class="badge-card">
+      <h3>45+ Yrs</h3>
+      <span>Experience</span>
+    </div>
+    <div class="badge-card">
+      <h3>10,000+</h3>
+      <span>Happy Patients</span>
+    </div>
+    <div class="badge-card">
+      <h3>100% Safe</h3>
+      <span>No Side-Effects</span>
+    </div>
+  </div>
+
+  <!-- About Section -->
+  <div class="box" id="about">
+    <h2>About Our Clinic</h2>
+    <p>With over <b>42 years of trusted clinical experience</b>, Dr. N. K. Tarun provides safe, natural, and root-cause homoeopathic treatment for chronic and complex diseases without any side-effects.</p>
+  </div>
+
+  <!-- Treatments Section -->
+  <div class="box" id="treatments">
+    <h2>Special Treatments</h2>
+    <ul>
+      <li><b>Skin &amp; Hair:</b> Pimples, Itching, White Patches, Hair Fall</li>
+      <li><b>Pain &amp; Joints:</b> Gout, Back Pain, Cervical, Migraine</li>
+      <li><b>Stomach:</b> Gas, Acidity, Constipation, Piles</li>
+      <li><b>Allergy &amp; Asthma:</b> Chronic Cough, Sinus, Cold</li>
+    </ul>
+  </div>
+
+  <!-- Patient Reviews Section -->
+  <div class="box" id="reviews">
+    <h2>What Our Patients Say</h2>
+    
+    <div class="review-card">
+      <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <p class="review-text">"I had severe migraine and cervical pain for 4 years. After taking Dr. Tarun's medicines for 2 months, I got complete relief."</p>
+      <div class="patient-name">- Rajesh Kumar (Patna)</div>
+    </div>
+
+    <div class="review-card">
+      <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <p class="review-text">"Very experienced and polite doctor. My chronic skin allergy cured permanently without any side-effects."</p>
+      <div class="patient-name">- Sunita Devi</div>
+    </div>
+
+    <div class="review-card" style="margin-bottom: 0;">
+      <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <p class="review-text">"Best homoeopathic clinic for stomach and joint problems. Doctor listens to every symptom very patiently."</p>
+      <div class="patient-name">- Amitabh Sinha</div>
+    </div>
+  </div>
+
+  <!-- Frequently Asked Questions (FAQ) -->
+  <div class="box" id="faq">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>1. Are homoeopathic medicines completely safe?</summary>
+      <p>Yes, homoeopathic remedies are natural, gentle, and 100% free from harmful side-effects. They are safe for children, adults, and elderly patients.</p>
+    </details>
+
+    <details>
+      <summary>2. How long does it take to see improvement?</summary>
+      <p>Acute problems start improving within a few days, while chronic conditions (like migraine, skin allergy, or arthritis) show steady, permanent recovery over a few weeks.</p>
+    </details>
+
+    <details style="margin-bottom: 0;">
+      <summary>3. Can I book an appointment via WhatsApp?</summary>
+      <p>Yes! Simply select your preferred 1-hour slot below and send your booking request directly to our clinic on WhatsApp.</p>
+    </details>
+  </div>
+
+  <!-- UPGRADED: 1-Hour Slot & Optional Online Payment Form -->
+  <div class="box" id="appointment">
+    <h2>Book 1-Hour Appointment Slot</h2>
+    <form onsubmit="sendToWhatsApp(); return false;">
+      <label>Patient Name:</label>
+      <input type="text" id="pName" placeholder="Enter your full name" required>
+
+      <label>Mobile Number:</label>
+      <input type="tel" id="pPhone" placeholder="10-digit mobile number" required>
+
+      <label>Select Date:</label>
+      <input type="date" id="pDate" required>
+
+      <label>Select 1-Hour Time Slot:</label>
+      <select id="pTime">
+        <optgroup label="Morning Shift (10:00 AM - 2:00 PM)">
+          <option>10:00 AM - 11:00 AM</option>
+          <option>11:00 AM - 12:00 PM</option>
+          <option>12:00 PM - 01:00 PM</option>
+          <option>01:00 PM - 02:00 PM</option>
+        </optgroup>
+        <optgroup label="Evening Shift (5:00 PM - 8:30 PM)">
+          <option>05:00 PM - 06:00 PM</option>
+          <option>06:00 PM - 07:00 PM</option>
+          <option>07:00 PM - 08:30 PM</option>
+        </optgroup>
+      </select>
+
+      <label>Select Problem:</label>
+      <select id="pProblem">
+        <option>Skin / Hair Problem</option>
+        <option>Joint Pain / Migraine</option>
+        <option>Gas / Acidity / Piles</option>
+        <option>Allergy / Chronic Cough</option>
+        <option>Other</option>
+      </select>
+
+      <label>Consultation Fee Option (Optional):</label>
+      <select id="pPayment" onchange="toggleUpiBox()">
+        <option value="Pay at Clinic">Pay at Clinic (On Visit)</option>
+        <option value="Online UPI Paid">Pay Online Now via UPI (GPay / PhonePe / Paytm)</option>
+      </select>
+
+      <!-- Optional UPI Payment Box -->
+      <div class="upi-box" id="upiSection">
+        <p><b>&#128179; Online Consultation Fee Payment</b></p>
+        <p>UPI ID: <b>sktarun.tarun@okhdfcbank</b></p>
+        <a href="upi://pay?pa=9835608949@upi&pn=Tarun%20Homoeo%20Clinic&cu=INR" class="upi-pay-btn">
+          &#128242; Open UPI App to Pay
+        </a>
+        <p style="font-size: 12px; color: #666; margin-top: 8px;">
+          *Payment karne ke baad neeche green button dabakar WhatsApp par screenshot bhej dein.
+        </p>
+      </div>
+
+      <button type="submit" class="btn" style="width: 100%; background-color: #1b6b45; cursor: pointer;">
+        &#9989; Confirm Slot on WhatsApp
+      </button>
+    </form>
+  </div>
+
+  <!-- Timing, Address & Map -->
+  <div class="box" id="contact">
+    <h2>Clinic Timing &amp; Address</h2>
+    
+    <div class="info-item">
+      <b>&#128338; Clinic Timings:</b><br>
+      Morning: 10:00 AM - 2:00 PM<br>
+      Evening: 5:00 PM - 8:30 PM<br>
+      <span style="color: #d9534f; font-weight: bold;">(Sunday Closed)</span>
+    </div>
+
+    <div class="info-item">
+      <b>&#128205; Clinic Address:</b><br>
+      Tarun Homoeo Clinic, 310, Shri Villa, Aadarsh Colony (Behind Samay Hospital, Near Shiv Mandir), Saguna More, Danapur Cantt, Patna-801503, Bihar
+    </div>
+
+    <!-- Google Map Box -->
+    <iframe 
+      src="https://www.google.com/maps?q=Saguna+More,+Danapur+Cantt,+Patna+801503&output=embed" 
+      width="100%" 
+      height="200" 
+      style="border:0; border-radius: 6px; margin-top: 6px;" 
+      loading="lazy">
+    </iframe>
+
+    <a href="https://www.google.com/maps/search/?api=1&query=Saguna+More,+Danapur+Cantt,+Patna+801503" target="_blank" class="btn" style="width: 100%; box-sizing: border-box; text-align: center; background-color: #124d31; margin-top: 12px;">
+      &#128506; Open in Google Maps (Get Directions)
+    </a>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    &copy; 2026 Tarun Homoeo Clinic. All Rights Reserved.
+  </div>
+
+  <!-- Floating WhatsApp Button -->
+  <a href="https://wa.me/919835608949?text=Namaste%20Doctor,%20mujhe%20appointment%20chahiye" target="_blank" class="floating-wa">
+    &#128172; Chat with Clinic
+  </a>
+
+  <!-- JavaScript Code -->
+  <script>
+    function toggleUpiBox() {
+      var payOption = document.getElementById("pPayment").value;
+      var upiBox = document.getElementById("upiSection");
+      if (payOption === "Online UPI Paid") {
+        upiBox.style.display = "block";
+      } else {
+        upiBox.style.display = "none";
+      }
+    }
+
+    function sendToWhatsApp() {
+      var name = document.getElementById("pName").value;
+      var phone = document.getElementById("pPhone").value;
+      var date = document.getElementById("pDate").value;
+      var time = document.getElementById("pTime").value;
+      var problem = document.getElementById("pProblem").value;
+      var payment = document.getElementById("pPayment").value;
+
+      var doctorNumber = "919835608949";
+
+      var message = "Namaste Doctor, I want to book an appointment:%0A%0A"
+                  + "*Name:* " + name + "%0A"
+                  + "*Mobile:* " + phone + "%0A"
+                  + "*Date:* " + date + "%0A"
+                  + "*Time Slot:* " + time + "%0A"
+                  + "*Problem:* " + problem + "%0A"
+                  + "*Fee Status:* " + payment;
+
+      var url = "https://wa.me/" + doctorNumber + "?text=" + message;
+      window.open(url, "_blank");
+    }
+  </script>
+
+</body>
+  </html>
+  
