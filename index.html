@@ -150,6 +150,12 @@
       font-size: 15px;
       background-color: white;
     }
+    .slot-note {
+      font-size: 12px;
+      color: #1b6b45;
+      margin: -10px 0 14px 0;
+      font-weight: bold;
+    }
     .upi-box {
       display: none;
       background-color: #fff8e7;
@@ -242,7 +248,7 @@
   <!-- About Section -->
   <div class="box" id="about">
     <h2>About Our Clinic</h2>
-    <p>With over <b>42 years of trusted clinical experience</b>, Dr. N. K. Tarun provides safe, natural, and root-cause homoeopathic treatment for chronic and complex diseases without any side-effects.</p>
+    <p>With over <b>45 years of trusted clinical experience</b>, Dr. N. K. Tarun provides safe, natural, and root-cause homoeopathic treatment for chronic and complex diseases without any side-effects.</p>
   </div>
 
   <!-- Treatments Section -->
@@ -295,11 +301,11 @@
 
     <details style="margin-bottom: 0;">
       <summary>3. Can I book an appointment via WhatsApp?</summary>
-      <p>Yes! Simply select your preferred 1-hour slot below and send your booking request directly to our clinic on WhatsApp.</p>
+      <p>Yes! Simply select your preferred available 1-hour slot below and send your booking request directly to our clinic on WhatsApp.</p>
     </details>
   </div>
 
-  <!-- UPGRADED: 1-Hour Slot & Optional Online Payment Form -->
+  <!-- Live Google Sheet Controlled 1-Hour Slot & Optional Online Payment Form -->
   <div class="box" id="appointment">
     <h2>Book 1-Hour Appointment Slot</h2>
     <form onsubmit="sendToWhatsApp(); return false;">
@@ -315,17 +321,18 @@
       <label>Select 1-Hour Time Slot:</label>
       <select id="pTime">
         <optgroup label="Morning Shift (10:00 AM - 2:00 PM)">
-          <option>10:00 AM - 11:00 AM</option>
-          <option>11:00 AM - 12:00 PM</option>
-          <option>12:00 PM - 01:00 PM</option>
-          <option>01:00 PM - 02:00 PM</option>
+          <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+          <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+          <option value="12:00 PM - 01:00 PM">12:00 PM - 01:00 PM</option>
+          <option value="01:00 PM - 02:00 PM">01:00 PM - 02:00 PM</option>
         </optgroup>
         <optgroup label="Evening Shift (5:00 PM - 8:30 PM)">
-          <option>05:00 PM - 06:00 PM</option>
-          <option>06:00 PM - 07:00 PM</option>
-          <option>07:00 PM - 08:30 PM</option>
+          <option value="05:00 PM - 06:00 PM">05:00 PM - 06:00 PM</option>
+          <option value="06:00 PM - 07:00 PM">06:00 PM - 07:00 PM</option>
+          <option value="07:00 PM - 08:30 PM">07:00 PM - 08:30 PM</option>
         </optgroup>
       </select>
+      <div class="slot-note" id="slotStatusNote">&#128994; Live slot availability updated from clinic desk.</div>
 
       <label>Select Problem:</label>
       <select id="pProblem">
@@ -345,7 +352,7 @@
       <!-- Optional UPI Payment Box -->
       <div class="upi-box" id="upiSection">
         <p><b>&#128179; Online Consultation Fee Payment</b></p>
-        <p>UPI ID: <b>sktarun.tarun@okhdfcbank</b></p>
+        <p>UPI ID: <b>9835608949@upi</b></p>
         <a href="upi://pay?pa=9835608949@upi&pn=Tarun%20Homoeo%20Clinic&cu=INR" class="upi-pay-btn">
           &#128242; Open UPI App to Pay
         </a>
@@ -400,8 +407,58 @@
     &#128172; Chat with Clinic
   </a>
 
-  <!-- JavaScript Code -->
+  <!-- JavaScript Code with Live Google Sheet Sync -->
   <script>
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTHNRh6IMbjHonfn4q-CXGMhvYuj4eoblP1E0r3Y7P1waH4hZ4d1Qc6__mlCLuRJFZG9ehSCebGmZaL/pub?gid=0&single=true&output=csv";
+
+    // Automatically fetch live slot statuses from Google Sheet
+    function loadLiveSlots() {
+      fetch(SHEET_CSV_URL + "&t=" + new Date().getTime())
+        .then(response => response.text())
+        .then(csvText => {
+          const rows = csvText.split(/\r?\n/);
+          const slotStatusMap = {};
+
+          for (let i = 1; i < rows.length; i++) {
+            const cols = rows[i].split(",");
+            if (cols.length >= 2) {
+              const slotName = cols[0].replace(/"/g, "").trim();
+              const status = cols[1].replace(/"/g, "").trim().toLowerCase();
+              if (slotName) {
+                slotStatusMap[slotName] = status;
+              }
+            }
+          }
+
+          const timeSelect = document.getElementById("pTime");
+          const options = timeSelect.querySelectorAll("option");
+          let firstAvailableSet = false;
+
+          options.forEach(opt => {
+            const baseSlot = opt.value;
+            const status = slotStatusMap[baseSlot];
+
+            if (status && status !== "open") {
+              opt.disabled = true;
+              opt.textContent = baseSlot + " (Slot Full)";
+            } else {
+              opt.disabled = false;
+              opt.textContent = baseSlot;
+              if (!firstAvailableSet) {
+                opt.selected = true;
+                firstAvailableSet = true;
+              }
+            }
+          });
+        })
+        .catch(err => {
+          console.log("Using default open slots:", err);
+        });
+    }
+
+    // Run on page load
+    window.addEventListener("DOMContentLoaded", loadLiveSlots);
+
     function toggleUpiBox() {
       var payOption = document.getElementById("pPayment").value;
       var upiBox = document.getElementById("upiSection");
@@ -416,7 +473,14 @@
       var name = document.getElementById("pName").value;
       var phone = document.getElementById("pPhone").value;
       var date = document.getElementById("pDate").value;
-      var time = document.getElementById("pTime").value;
+      var timeSelect = document.getElementById("pTime");
+      var time = timeSelect.value;
+
+      if (timeSelect.options[timeSelect.selectedIndex].disabled) {
+        alert("Yeh time slot abhi full hai. Kripya koi doosra available slot chunein.");
+        return;
+      }
+
       var problem = document.getElementById("pProblem").value;
       var payment = document.getElementById("pPayment").value;
 
@@ -436,5 +500,4 @@
   </script>
 
 </body>
-  </html>
-  
+</html>
