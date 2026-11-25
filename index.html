@@ -316,7 +316,9 @@
       <input type="tel" id="pPhone" placeholder="10-digit mobile number" required>
 
       <label>Select Date:</label>
-      <input type="date" id="pDate" required>
+      <<input type="date" id="pDate" onchange="updateSlotsForSelectedDate()" required>
+<div id="sundayWarning" style="display:none; color:#b71c1c; font-size:13px; font-weight:bold; margin:-8px 0 12px 0;">&#9888; Sunday ko clinic band rehta hai. Kripya Monday se Saturday ke beech tareekh chunein.</div>
+        >
 
       <label>Select 1-Hour Time Slot:</label>
       <select id="pTime">
@@ -407,97 +409,122 @@
     &#128172; Chat with Clinic
   </a>
 
-  <!-- JavaScript Code with Live Google Sheet Sync -->
-  <script>
+  <!-- JavaScript Code with Live Google Sheet Sync -->l
+  
+      <script>
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTHNRh6IMbjHonfn4q-CXGMhvYuj4eoblP1E0r3Y7P1waH4hZ4d1Qc6__mlCLuRJFZG9ehSCebGmZaL/pub?gid=0&single=true&output=csv";
+    let dateSlotMap = {};
 
-    // Automatically fetch live slot statuses from Google Sheet
+    function normalizeDate(rawDate) {
+      let d = rawDate.replace(/"/g, "").trim();
+      if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(d)) {
+        const p = d.split("-");
+        return p[0] + "-" + p[1].padStart(2, "0") + "-" + p[2].padStart(2, "0");
+      }
+      if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/.test(d)) {
+        const p = d.split(/[\/\-]/);
+        return p[2] + "-" + p[1].padStart(2, "0") + "-" + p[0].padStart(2, "0");
+      }
+      return d;
+    }
+
     function loadLiveSlots() {
       fetch(SHEET_CSV_URL + "&t=" + new Date().getTime())
-        .then(response => response.text())
+        .then(r => r.text())
         .then(csvText => {
           const rows = csvText.split(/\r?\n/);
-          const slotStatusMap = {};
-
+          dateSlotMap = {};
           for (let i = 1; i < rows.length; i++) {
             const cols = rows[i].split(",");
-            if (cols.length >= 2) {
-              const slotName = cols[0].replace(/"/g, "").trim();
-              const status = cols[1].replace(/"/g, "").trim().toLowerCase();
-              if (slotName) {
-                slotStatusMap[slotName] = status;
+            if (cols.length >= 3) {
+              const rowDate = normalizeDate(cols[0]);
+              const slotName = cols[1].replace(/"/g, "").trim();
+              const status = cols[2].replace(/"/g, "").trim().toLowerCase();
+              if (rowDate && slotName) {
+                if (!dateSlotMap[rowDate]) dateSlotMap[rowDate] = {};
+                dateSlotMap[rowDate][slotName] = status;
               }
             }
           }
-
-          const timeSelect = document.getElementById("pTime");
-          const options = timeSelect.querySelectorAll("option");
-          let firstAvailableSet = false;
-
-          options.forEach(opt => {
-            const baseSlot = opt.value;
-            const status = slotStatusMap[baseSlot];
-
-            if (status && status !== "open") {
-              opt.disabled = true;
-              opt.textContent = baseSlot + " (Slot Full)";
-            } else {
-              opt.disabled = false;
-              opt.textContent = baseSlot;
-              if (!firstAvailableSet) {
-                opt.selected = true;
-                firstAvailableSet = true;
-              }
-            }
-          });
-        })
-        .catch(err => {
-          console.log("Using default open slots:", err);
+          updateSlotsForSelectedDate();
         });
     }
 
-    // Run on page load
-    window.addEventListener("DOMContentLoaded", loadLiveSlots);
+    function updateSlotsForSelectedDate() {
+      const selectedDate = document.getElementById("pDate").value;
+      const sundayWarning = document.getElementById("sundayWarning");
+      const options = document.getElementById("pTime").querySelectorAll("option");
+      const note = document.getElementById("slotStatusNote");
+
+      if (selectedDate) {
+        const p = selectedDate.split("-");
+        const dayObj = new Date(p[0], p[1] - 1, p[2]);
+        sundayWarning.style.display = (dayObj.getDay() === 0) ? "block" : "none";
+      }
+
+      const slotsForDate = dateSlotMap[selectedDate] || {};
+      let firstAvailableSet = false;
+
+      options.forEach(opt => {
+        const baseSlot = opt.value;
+        const status = slotsForDate[baseSlot];
+        if (status && status !== "open") {
+          opt.disabled = true;
+          opt.textContent = baseSlot + " (Slot Full)";
+        } else {
+          opt.disabled = false;
+          opt.textContent = baseSlot;
+          if (!firstAvailableSet) {
+            opt.selected = true;
+            firstAvailableSet = true;
+          }
+        }
+      });
+
+      if (selectedDate) {
+        note.innerHTML = "&#128994; Live slot status for <b>" + selectedDate + "</b>";
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", function() {
+      const today = new Date();
+      const todayStr = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
+      const dateInput = document.getElementById("pDate");
+      dateInput.min = todayStr;
+      dateInput.value = todayStr;
+      loadLiveSlots();
+    });
 
     function toggleUpiBox() {
       var payOption = document.getElementById("pPayment").value;
-      var upiBox = document.getElementById("upiSection");
-      if (payOption === "Online UPI Paid") {
-        upiBox.style.display = "block";
-      } else {
-        upiBox.style.display = "none";
-      }
+      document.getElementById("upiSection").style.display = (payOption === "Online UPI Paid") ? "block" : "none";
     }
 
     function sendToWhatsApp() {
       var name = document.getElementById("pName").value;
       var phone = document.getElementById("pPhone").value;
       var date = document.getElementById("pDate").value;
-      var timeSelect = document.getElementById("pTime");
-      var time = timeSelect.value;
-
-      if (timeSelect.options[timeSelect.selectedIndex].disabled) {
-        alert("Yeh time slot abhi full hai. Kripya koi doosra available slot chunein.");
+      var p = date.split("-");
+      if (new Date(p[0], p[1] - 1, p[2]).getDay() === 0) {
+        alert("Sunday ko clinic band rehta hai. Kripya Monday se Saturday ke beech tareekh chunein.");
         return;
       }
-
-      var problem = document.getElementById("pProblem").value;
-      var payment = document.getElementById("pPayment").value;
-
-      var doctorNumber = "919835608949";
-
+      var timeSelect = document.getElementById("pTime");
+      if (timeSelect.options[timeSelect.selectedIndex].disabled) {
+        alert("Is tareekh par yeh time slot full hai. Kripya koi doosra available slot chunein.");
+        return;
+      }
       var message = "Namaste Doctor, I want to book an appointment:%0A%0A"
                   + "*Name:* " + name + "%0A"
                   + "*Mobile:* " + phone + "%0A"
                   + "*Date:* " + date + "%0A"
-                  + "*Time Slot:* " + time + "%0A"
-                  + "*Problem:* " + problem + "%0A"
-                  + "*Fee Status:* " + payment;
-
-      var url = "https://wa.me/" + doctorNumber + "?text=" + message;
-      window.open(url, "_blank");
+                  + "*Time Slot:* " + timeSelect.value + "%0A"
+                  + "*Problem:* " + document.getElementById("pProblem").value + "%0A"
+                  + "*Fee Status:* " + document.getElementById("pPayment").value;
+      window.open("https://wa.me/919835608949?text=" + message, "_blank");
     }
   </script>
+  
 
 </body>
 </html>
